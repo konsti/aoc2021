@@ -54,13 +54,11 @@ func Part1(input []int) int {
 
 func Part2(input []int) int {
 	accumulator := 0
-	for i := 0; i < len(input)-1; i++ {
-		if i < len(input)-3 {
-			window1 := input[i] + input[i+1] + input[i+2]
-			window2 := input[i+1] + input[i+2] + input[i+3]
-			if window2 > window1 {
-				accumulator++
-			}
+	for i := 0; i < len(input)-3; i++ {
+		window1 := input[i] + input[i+1] + input[i+2]
+		window2 := input[i+1] + input[i+2] + input[i+3]
+		if window2 > window1 {
+			accumulator++
 		}
 	}
 
