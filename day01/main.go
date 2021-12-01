@@ -2,9 +2,17 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
+)
+
+var (
+	Green  = color("32")
+	Yellow = color("33")
+	Purple = color("35")
+	Teal   = color("36")
 )
 
 func failOnError(err error, msg string) {
@@ -42,6 +50,12 @@ func readInput(filename string) []int {
 	return input
 }
 
+func color(colorString string) func(...interface{}) string {
+	return func(args ...interface{}) string {
+		return fmt.Sprintf("\x1b["+colorString+"m%s\x1b[0m", fmt.Sprint(args...))
+	}
+}
+
 func Part1(input []int) int {
 	accumulator := 0
 	for i := 0; i < len(input)-1; i++ {
@@ -66,25 +80,27 @@ func Part2(input []int) int {
 }
 
 func main() {
-	log.Println("Advent of Code - Day 1")
-	log.Print("======================\n\n")
+	fmt.Println(Purple("Advent of Code - Day 1"))
+	fmt.Print("======================\n\n")
 
 	exampleInput := readInput("example.txt")
 	input := readInput("input.txt")
 
-	log.Println("* Part 1 [Example Input]")
+	// Part 1
+
+	fmt.Println("* Part 1 | How many measurements are larger than the previous measurement?")
 	exampleResultPart1 := strconv.Itoa(Part1(exampleInput))
-	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", exampleResultPart1)
+	fmt.Printf(Yellow("[Example Input]: %s \n"), Teal(exampleResultPart1))
 
-	log.Println("* Part 1 [Real Input]")
 	resultPart1 := strconv.Itoa(Part1(input))
-	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", resultPart1)
+	fmt.Printf(Green("[Real Input]: %s \n\n"), Teal(resultPart1))
 
-	log.Println("* Part 2 [Example Input]")
+	// Part 2
+
+	fmt.Println("* Part 2 | How many sums are larger than the previous sum?")
 	exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
-	log.Printf("How many sums are larger than the previous sum?	%s \n\n", exampleResultPart2)
+	fmt.Printf(Yellow("[Example Input]: %s \n"), Teal(exampleResultPart2))
 
-	log.Println("* Part 2 [Real Input]")
 	resultPart2 := strconv.Itoa(Part2(input))
-	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", resultPart2)
+	fmt.Printf(Green("[Real Input]:	%s \n"), Teal(resultPart2))
 }
