@@ -52,17 +52,41 @@ func Part1(input []int) int {
 	return accumulator
 }
 
+func Part2(input []int) int {
+	accumulator := 0
+	for i := 0; i < len(input)-1; i++ {
+		if i < len(input)-3 {
+			window1 := input[i] + input[i+1] + input[i+2]
+			window2 := input[i+1] + input[i+2] + input[i+3]
+			if window2 > window1 {
+				accumulator++
+			}
+		}
+	}
+
+	return accumulator
+}
+
 func main() {
 	log.Println("Advent of Code - Day 1")
 	log.Print("======================\n\n")
 
-	log.Println("* Part 1 [Example Input]")
-
 	exampleInput := readInput("example.txt")
-	exampleResult := strconv.Itoa(Part1(exampleInput))
-	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", exampleResult)
-
 	input := readInput("input.txt")
-	result := strconv.Itoa(Part1(input))
-	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", result)
+
+	log.Println("* Part 1 [Example Input]")
+	exampleResultPart1 := strconv.Itoa(Part1(exampleInput))
+	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", exampleResultPart1)
+
+	log.Println("* Part 1 [Real Input]")
+	resultPart1 := strconv.Itoa(Part1(input))
+	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", resultPart1)
+
+	log.Println("* Part 2 [Example Input]")
+	exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
+	log.Printf("How many sums are larger than the previous sum?	%s \n\n", exampleResultPart2)
+
+	log.Println("* Part 2 [Real Input]")
+	resultPart2 := strconv.Itoa(Part2(input))
+	log.Printf("How many measurements are larger than the previous measurement?	%s \n\n", resultPart2)
 }
