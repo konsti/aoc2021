@@ -123,7 +123,7 @@ func Part2(input []string) int {
 }
 
 func main() {
-	fmt.Println(color.Purple("Advent of Code - Day 1"))
+	fmt.Println(color.Purple("Advent of Code - Day 3"))
 	fmt.Print("======================\n\n")
 
 	exampleInput := readInput("example.txt")
