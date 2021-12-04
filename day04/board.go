@@ -40,6 +40,12 @@ func NewBoard(numbers []int) (*Board, error) {
 	return &board, nil
 }
 
+func (board *Board) Play(number int) {
+	if _, ok := board.byNumber[number]; ok {
+		board.byNumber[number].checked = true
+	}
+}
+
 // Allows to filter the board by checked or unchecked fields
 func (board *Board) Filter(checked bool) []*Field {
 	var fields []*Field
