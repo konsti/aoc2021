@@ -38,7 +38,12 @@ func magnitude(vector Vector) float64 {
 
 func normalize(vector Vector) Vector {
 	magnitude := magnitude(vector)
-	return Vector{vector.X / int(magnitude), vector.Y / int(magnitude), vector.A, vector.B}
+	return Vector{
+		int(math.Round(float64(vector.X) / magnitude)),
+		int(math.Round(float64(vector.Y) / magnitude)),
+		vector.A,
+		vector.B,
+	}
 }
 
 // Implemented after math in https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
@@ -106,11 +111,16 @@ func markPoints(grid [][]int, vector Vector) {
 	normalizedVector := normalize(vector)
 
 	// Mark the first point
+	// fmt.Println(color.Blue("marking", currentPoint))
 	grid[currentPoint.X][currentPoint.Y]++
 
 	for {
+		if currentPoint.X+normalizedVector.X == currentPoint.X && currentPoint.Y+normalizedVector.Y == currentPoint.Y {
+			panic("Stuck in a loop")
+		}
 		currentPoint.X += normalizedVector.X
 		currentPoint.Y += normalizedVector.Y
+		// fmt.Println(color.Blue("marking", currentPoint))
 		grid[currentPoint.X][currentPoint.Y]++
 		if currentPoint.X == vector.B.X && currentPoint.Y == vector.B.Y {
 			break
@@ -181,6 +191,52 @@ func Part1(input []Vector, showGrid bool) int {
 	return count
 }
 
+func Part2(input []Vector, showGrid bool) int {
+	maxX := 0
+	maxY := 0
+
+	// Find the max X and Y values
+	for _, vector := range input {
+		if vector.A.X > maxX {
+			maxX = vector.A.X
+		}
+		if vector.A.Y > maxY {
+			maxY = vector.A.Y
+		}
+		if vector.B.X > maxX {
+			maxX = vector.B.X
+		}
+		if vector.B.Y > maxY {
+			maxY = vector.B.Y
+		}
+	}
+
+	grid := make([][]int, maxX+1)
+	for i := range grid {
+		grid[i] = make([]int, maxY+1)
+	}
+
+	for _, vector := range input {
+		markPoints(grid, vector)
+	}
+
+	if showGrid {
+		printGrid(grid)
+	}
+
+	// Count the number of points that have been marked above 1
+	count := 0
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[i]); j++ {
+			if grid[i][j] > 1 {
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
 func main() {
 	fmt.Println(color.Purple("Advent of Code - Day 5"))
 	fmt.Print("======================\n\n")
@@ -190,10 +246,19 @@ func main() {
 
 	// Part 1
 
-	fmt.Println("* Part 1 | At how many points do at least two lines overlap?")
+	fmt.Println("* Part 1 | At how many points do at least two horizontal or vertical lines overlap?")
 	exampleResultPart1 := strconv.Itoa(Part1(exampleInput, true))
 	fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart1))
 
 	resultPart1 := strconv.Itoa(Part1(input, false))
 	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart1))
+
+	// Part 2
+
+	fmt.Println("* Part 2 | At how many points do at least two lines overlap?")
+	exampleResultPart2 := strconv.Itoa(Part2(exampleInput, true))
+	fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+
+	resultPart2 := strconv.Itoa(Part2(input, false))
+	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
 }
