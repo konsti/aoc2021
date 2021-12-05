@@ -5,6 +5,7 @@ import "fmt"
 var (
 	Green  = color("32")
 	Yellow = color("33")
+	Blue   = color("34")
 	Purple = color("35")
 	Teal   = color("36")
 )
