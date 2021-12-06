@@ -10,7 +10,7 @@ import (
 	"github.com/konsti/aoc2021/utils/logging"
 )
 
-func readInput(filename string) []int {
+func readInput(filename string) [9]int {
 	var numbersInt []int
 
 	lines, err := input.ReadLines(filename)
@@ -24,41 +24,50 @@ func readInput(filename string) []int {
 		numbersInt = append(numbersInt, i)
 	}
 
-	return numbersInt
-}
-
-func NextGeneration(input []int) []int {
-	var nextGeneration []int
-	var numberNewLanternfishes int
-
-	for _, value := range input {
-		if value == 0 {
-			nextGeneration = append(nextGeneration, 6)
-			numberNewLanternfishes++
-		} else {
-			nextGeneration = append(nextGeneration, value-1)
-		}
+	var population [9]int
+	for _, value := range numbersInt {
+		population[value]++
 	}
 
-	for i := 0; i < numberNewLanternfishes; i++ {
-		nextGeneration = append(nextGeneration, 8)
-	}
-
-	return nextGeneration
+	return population
 }
 
-func Part1(input []int) int {
-	// fmt.Println("Initial state:", input)
-	for i := 0; i < 80; i++ {
-		input = NextGeneration(input)
-		// fmt.Println("After ", i+1, "day: ", input)
+func rotateLeft(nums [9]int, n int) [9]int {
+	if n < 0 || len(nums) == 0 {
+		return nums
 	}
+	rotatedNums := append(nums[n:], nums[:n]...)
 
-	return len(input)
+	var returnNums [9]int
+	copy(returnNums[:], rotatedNums)
+
+	return returnNums
 }
 
-func Part2(input []int) int {
-	return 0
+func growPopulation(population [9]int, days int) [9]int {
+	for i := 0; i < days; i++ {
+		population = rotateLeft(population, 1)
+		population[6] += population[8]
+	}
+	return population
+}
+
+func sum(nums [9]int) int {
+	sum := 0
+	for _, value := range nums {
+		sum += value
+	}
+	return sum
+}
+
+func Part1(population [9]int) int {
+	population80 := growPopulation(population, 80)
+	return sum(population80)
+}
+
+func Part2(population [9]int) int {
+	population256 := growPopulation(population, 256)
+	return sum(population256)
 }
 
 func main() {
@@ -79,10 +88,10 @@ func main() {
 
 	// Part 2
 
-	// fmt.Println("* Part 2 | How many lanternfish would there be after 256 days?")
-	// exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
-	// fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+	fmt.Println("* Part 2 | How many lanternfish would there be after 256 days?")
+	exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
+	fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
 
-	// resultPart2 := strconv.Itoa(Part2(input))
-	// fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
+	resultPart2 := strconv.Itoa(Part2(input))
+	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
 }
