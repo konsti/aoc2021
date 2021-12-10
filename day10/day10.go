@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/konsti/aoc2021/utils/color"
@@ -38,7 +39,10 @@ func isOpening(r rune) bool {
 	return r == '(' || r == '[' || r == '{' || r == '<'
 }
 
-func buildTree(input string) (*Node, rune) {
+// Tries to build the AST from the given input
+// If chunks are not closed, it tries to close them and returns an array of used delimiters
+// If some chunks close with an incorrect delimiter, it returns the first incorrect delimiter
+func checkTree(input string) ([]rune, rune) {
 	rootNode := &Node{
 		id: cuid.Slug(),
 	}
@@ -59,7 +63,13 @@ func buildTree(input string) (*Node, rune) {
 		}
 	}
 
-	return rootNode, ' '
+	newDelimiters := []rune{}
+	for ok := true; ok; ok = currentNode.close != currentNode.delimiter.close {
+		newDelimiters = append(newDelimiters, currentNode.delimiter.close)
+		currentNode = currentNode.parent
+	}
+
+	return newDelimiters, ' '
 }
 
 func readInput(filename string) []string {
@@ -72,7 +82,7 @@ func readInput(filename string) []string {
 func Part1(input []string) int {
 	score := 0
 
-	scores := map[rune]int{
+	points := map[rune]int{
 		')': 3,
 		']': 57,
 		'}': 1197,
@@ -80,17 +90,48 @@ func Part1(input []string) int {
 	}
 
 	for _, line := range input {
-		_, corruptRune := buildTree(line)
+		_, corruptRune := checkTree(line)
 		if corruptRune != ' ' {
-			score += scores[corruptRune]
+			score += points[corruptRune]
 		}
 	}
 
 	return score
 }
 
+func median(input []float64) float64 {
+	sort.Float64s(input)
+	median := float64(0)
+	if len(input)%2 == 0 {
+		median = (input[len(input)/2-1] + input[len(input)/2]) / 2
+	} else {
+		median = input[len(input)/2]
+	}
+	return median
+}
+
 func Part2(input []string) int {
-	return 0
+	var scores []float64
+
+	points := map[rune]float64{
+		')': 1.0,
+		']': 2.0,
+		'}': 3.0,
+		'>': 4.0,
+	}
+
+	for _, line := range input {
+		newDelimiters, _ := checkTree(line)
+		if newDelimiters != nil {
+			score := 0.0
+			for _, d := range newDelimiters {
+				score = score*5.0 + points[d]
+			}
+			scores = append(scores, score)
+		}
+	}
+
+	return int(median(scores))
 }
 
 func main() {
@@ -111,10 +152,10 @@ func main() {
 
 	// Part 2
 
-	// fmt.Println("* Part 2 | What do you get if you multiply together the sizes of the three largest basins?")
-	// exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
-	// fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+	fmt.Println("* Part 2 | What is the middle score?")
+	exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
+	fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
 
-	// resultPart2 := strconv.Itoa(Part2(input))
-	// fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
+	resultPart2 := strconv.Itoa(Part2(input))
+	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
 }
