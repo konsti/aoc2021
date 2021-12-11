@@ -108,8 +108,22 @@ func Part1(input []*DumboOctopus) int {
 	return totalFlashes
 }
 
-func Part2(input []DumboOctopus) int {
-	return 0
+func Part2(input []*DumboOctopus) int {
+	stepCount := 0
+	stop := false
+
+	for ok := true; ok; ok = !stop {
+		flashes := step(input)
+		if flashes == len(input) {
+			stop = true
+		}
+		stepCount++
+		if stepCount == 500 {
+			panic("Step count exceeded 500")
+		}
+	}
+
+	return stepCount
 }
 
 func main() {
@@ -130,10 +144,13 @@ func main() {
 
 	// Part 2
 
-	// fmt.Println("* Part 2 | What is the middle score?")
-	// exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
-	// fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+	exampleInput = readInput("example.txt")
+	input = readInput("input.txt")
 
-	// resultPart2 := strconv.Itoa(Part2(input))
-	// fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
+	fmt.Println("* Part 2 | What is the first step during which all octopuses flash?")
+	exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
+	fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+
+	resultPart2 := strconv.Itoa(Part2(input))
+	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
 }
