@@ -28,6 +28,27 @@ func IsLower(s string) bool {
 	return true
 }
 
+func findSmallCaves(caves []*Cave) []*Cave {
+	var smallCaves []*Cave
+	for _, cave := range caves {
+		if cave.small && cave.id != "start" && cave.id != "end" {
+			smallCaves = append(smallCaves, cave)
+		}
+	}
+	return smallCaves
+}
+
+func anySmallCaveTwice(caves []*Cave) bool {
+	dict := make(map[string]int)
+	for _, cave := range caves {
+		dict[cave.id]++
+		if dict[cave.id] > 1 {
+			return true
+		}
+	}
+	return false
+}
+
 // In order to solve the puzzle, we need to build a graph of the cave system.
 // Then we can use path finding to find pathes through the graph.
 func readInput(filename string) (*graph.Mutable, map[string]*Cave, map[int]*Cave) {
@@ -73,19 +94,19 @@ func readInput(filename string) (*graph.Mutable, map[string]*Cave, map[int]*Cave
 }
 
 // Using a recursive Depth First Traversal to find all paths through the graph.
-func findAllPaths(caveSystem *graph.Mutable, caves map[string]*Cave, dict map[int]*Cave) [][]*Cave {
+func findAllPaths(caveSystem *graph.Mutable, caves map[string]*Cave, dict map[int]*Cave, allowTwice bool) [][]*Cave {
 	// Reset visits
 	for id := range caves {
 		caves[id].visits = 0
 	}
 
 	var paths [][]*Cave
-	paths = visitPaths(paths, caveSystem, caves["start"], caves["end"], []*Cave{caves["start"]}, dict)
+	paths = visitPaths(paths, caveSystem, caves["start"], caves["end"], []*Cave{caves["start"]}, dict, allowTwice)
 
 	return paths
 }
 
-func visitPaths(all [][]*Cave, caveSystem *graph.Mutable, from *Cave, to *Cave, paths []*Cave, dict map[int]*Cave) [][]*Cave {
+func visitPaths(all [][]*Cave, caveSystem *graph.Mutable, from *Cave, to *Cave, paths []*Cave, dict map[int]*Cave, allowTwice bool) [][]*Cave {
 	// fmt.Println("Visiting path from: ", from.id, " to: ", to.id)
 
 	if from.id == to.id {
@@ -104,9 +125,9 @@ func visitPaths(all [][]*Cave, caveSystem *graph.Mutable, from *Cave, to *Cave, 
 		// fmt.Println(color.Green("Visiting: ", dict[toInt].id, " from: ", from.id))
 		cave := dict[toInt]
 		// Only big caves can be visited twice
-		if cave.visits == 0 || !cave.small {
+		if isVisitAllowed(cave, paths, allowTwice) {
 			paths = append(paths, dict[toInt])
-			all = visitPaths(all, caveSystem, dict[toInt], to, paths, dict)
+			all = visitPaths(all, caveSystem, dict[toInt], to, paths, dict, allowTwice)
 			paths = paths[:len(paths)-1]
 		}
 		return
@@ -117,14 +138,48 @@ func visitPaths(all [][]*Cave, caveSystem *graph.Mutable, from *Cave, to *Cave, 
 	return all
 }
 
+func isVisitAllowed(cave *Cave, paths []*Cave, allowTwice bool) bool {
+	if cave.id == "start" {
+		return false
+	}
+
+	// The first visit is always allowed
+	if cave.visits == 0 {
+		return true
+	}
+
+	// Big caves are always allowed to be visited
+	if !cave.small {
+		return true
+	}
+
+	// Normally small caves are only allowed to be visited once
+	if allowTwice {
+		smallCaves := findSmallCaves(paths)
+		// If there are no small cave in the path, then the cave is allowed to be visited
+		if len(smallCaves) == 0 {
+			return true
+		} else {
+			// If no small cave has been visited twice yet, allow the cave to be visited
+			if !anySmallCaveTwice(smallCaves) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func Part1(caveSystem *graph.Mutable, caves map[string]*Cave, dict map[int]*Cave) int {
-	paths := findAllPaths(caveSystem, caves, dict)
+	paths := findAllPaths(caveSystem, caves, dict, false)
 
 	return len(paths)
 }
 
-func Part2(input string) int {
-	return 0
+func Part2(caveSystem *graph.Mutable, caves map[string]*Cave, dict map[int]*Cave) int {
+	paths := findAllPaths(caveSystem, caves, dict, true)
+
+	return len(paths)
 }
 
 func main() {
@@ -153,10 +208,16 @@ func main() {
 
 	// Part 2
 
-	// fmt.Println("* Part 2 | What is the first step during which all octopuses flash?")
-	// exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
-	// fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+	fmt.Println("* Part 2 | How many paths through this cave system are there?")
+	exampleResultPart2 := strconv.Itoa(Part2(graph1, caves1, dict1))
+	fmt.Printf(color.Yellow("[Example Input 1]: %s \n"), color.Teal(exampleResultPart2))
 
-	// resultPart2 := strconv.Itoa(Part2(input))
-	// fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
+	exampleResult2Part2 := strconv.Itoa(Part2(graph2, caves2, dict2))
+	fmt.Printf(color.Yellow("[Example Input 2]: %s \n"), color.Teal(exampleResult2Part2))
+
+	exampleResult3Part2 := strconv.Itoa(Part2(graph3, caves3, dict3))
+	fmt.Printf(color.Yellow("[Example Input 3]: %s \n"), color.Teal(exampleResult3Part2))
+
+	resultPart2 := strconv.Itoa(Part2(graphInput, cavesInput, dictInput))
+	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
 }
