@@ -112,6 +112,42 @@ func Part1(points []Point, instructions []FoldInstruction) int {
 	return countUnique(points)
 }
 
+func contains(points []Point, point Point) bool {
+	for _, p := range points {
+		if p == point {
+			return true
+		}
+	}
+	return false
+}
+
+func printPoints(points []Point) {
+	maxX := findMax(points, "x")
+	maxY := findMax(points, "y")
+
+	for y := 0; y <= maxY; y++ {
+		for x := 0; x <= maxX; x++ {
+			point := Point{x, y}
+			if contains(points, point) {
+				fmt.Print(color.Green("#"))
+			} else {
+				fmt.Print(".")
+			}
+		}
+		fmt.Println()
+	}
+}
+
+func Part2(points []Point, instructions []FoldInstruction) int {
+	for _, instruction := range instructions {
+		points = foldGrid(points, instruction)
+	}
+
+	printPoints(points)
+
+	return 0
+}
+
 func main() {
 	fmt.Println(color.Purple("Advent of Code - Day13"))
 	fmt.Print("======================\n\n")
@@ -130,10 +166,10 @@ func main() {
 
 	// Part 2
 
-	// fmt.Println("* Part 2 | What is the first step during which all octopuses flash?")
-	// exampleResultPart2 := strconv.Itoa(Part2(exampleInput))
-	// fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
+	fmt.Println("* Part 2 | What code do you use to activate the infrared thermal imaging camera system?")
+	exampleResultPart2 := strconv.Itoa(Part2(examplePoints, exampleInstructions))
+	fmt.Printf(color.Yellow("[Example Input]: %s \n"), color.Teal(exampleResultPart2))
 
-	// resultPart2 := strconv.Itoa(Part2(input))
-	// fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
+	resultPart2 := strconv.Itoa(Part2(inputPoints, inputInstructions))
+	fmt.Printf(color.Green("[Real Input]: %s \n\n"), color.Teal(resultPart2))
 }
