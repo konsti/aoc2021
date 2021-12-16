@@ -183,7 +183,7 @@ func Part2(caveSystem *graph.Mutable, caves map[string]*Cave, dict map[int]*Cave
 }
 
 func main() {
-	fmt.Println(color.Purple("Advent of Code - Day11"))
+	fmt.Println(color.Purple("Advent of Code - Day12"))
 	fmt.Print("======================\n")
 
 	graph1, caves1, dict1 := readInput("example1.txt")
